@@ -1,0 +1,241 @@
+#!/bin/bash
+
+
+########################################
+#CHECK if the user entered a file name.#
+########################################
+
+missingFileName(){
+if
+  #not missing any arguments
+        [ $1 -eq 0 ] 2> /dev/null
+then
+        echo "rm: missing operand"
+        echo "Try \`rm--help for more information'"
+fi
+}
+
+
+function setDirectory() {
+  contents=$(cat ~/.rm.cfg)
+  if [  -n "$RMCFG" ] ; then
+    safeDeleteDirectory="$RMCFG"
+    echo "$safeDeleteDirectory env variable"
+    #environment variable found
+
+  elif [ -f "$RMCFG_FILE"] ; then
+    #use the path from .rm.cfg since file exists
+    safeDeleteDirectory="$contents"
+    echo ".rm.cfg exists with the directory of $safeDeleteDirectory"
+
+  else
+    echo ".rm.cfg doesn't exist"
+    #don't do anything and keep it to the default
+
+  fi
+
+  createDirectory
+
+}
+
+
+function createDirectory() {
+  #if directory doesn't exist
+  if [ ! -d "$safeDeleteDirectory" ] ; then
+    echo "Directory doesn't exist. Creating directory "
+    mkdir "$safeDeleteDirectory"
+  fi
+  echo "The directory for the recyling bin will now be located in $safeDeleteDirectory"
+}
+
+
+function removeFile() {
+  fileRestoreInfo=""
+  if [ "$1" -eq 1 ] && [ -d "$2" ]; then
+    #recursive directory is being deleted
+    IFS=$'\n';
+    count=$(find "$arg" -not -path '*/\.*' | tac | wc -l)
+    for file in $(find "$fileName" -not -path '*/\.*' | tac);
+    do
+      fileLocation="$3/$file"
+      currentFile=""
+
+      if [ $count -ne 1 ] ; then
+        currentFile=$(echo $file | rev | cut -d'/' -f1 | rev)
+      else
+        currentFile=$(echo $file | cut -d'/' -f1)
+      fi
+
+      node=$(ls -id $fileLocation | grep -w "$file" | cut -d' ' -f1 )
+      actualName=$(echo $currentFile"_"$node)
+
+      mv $fileLocation $4"/"$actualName 2>/dev/null 
+      fileRestoreInfo=$actualName":"$(pwd)"/"$currentFile 
+      count=$(($count+1))
+      echo $fileRestoreInfo >> ~/.restore.info
+    done
+  else #non recursive directory is being deleted
+      mv $2 $4"/"$5 2>/dev/null
+      echo $6 >> ~/.restore.info
+  fi
+}
+
+#set variables
+i_check=0
+v_check=0
+r_check=0
+safeDeleteDirectory=~/deleted
+RMCFG_FILE=~/.rm.cfg
+
+
+
+#check flags
+OPTIND=1
+while getopts virVIR opt
+do
+    opt=$(echo "$opt" | tr [:upper:] [:lower:])
+    case $opt in
+    i) echo "i_check has been selected"
+      i_check=1
+    ;;
+    v)
+     echo "v_check has been selected"
+      v_check=1
+    ;;
+    r)
+      echo "r_check has been selected"
+      r_check=1
+    ;;
+  esac
+done
+
+shift "$((OPTIND-1))"
+#end of checking flags
+
+
+
+
+
+
+
+
+missingFileName $#
+setDirectory
+
+
+
+
+#!!!!!-----END OF CHECK-----!!!!!
+
+
+#####################################################
+#MOVING the renamed file to the "deleted" directory.#
+#####################################################
+
+
+moving_file(){
+
+# --------------------- Main core functions please write them on your own ----
+
+
+#current directory
+currentDirectory=$(pwd)
+
+# create file path using  filePath command
+
+ echo "DIY: create file path using a filePath parameter and command"
+ mkdir $safeDeleteDirectory
+# create file name using  fileName=$(basename ???)
+
+ echo "DIY: create file name using fileName= basename "
+ fileName=$1
+# create file inode using ls -i
+
+ echo "DIY: create file inode using ls -i"
+ nodeName=$(ls -i $fileName | cut -d' ' -f1)
+
+# change the format to  $filenName"_"$fileNode
+
+  echo "DIY: change the format to fileName_fileNode "
+  newFileName=$fileName"_"$nodeName
+
+# get the fileRestore Information
+ 
+  echo "DIY: get the fileRestore information"
+  fileRestoreInfo=$newFileName":"$(pwd)"/"$fileName 
+
+# positiveReponse =y
+   
+   echo "DIY: set positiveReponse = y"
+   positiveResponse=y
+
+
+#####################################
+#CHECK if file to-be deleted exists.#
+#####################################
+if [ ! -f $1 ] && [ ! -d $1 ] ;
+then
+        echo "rm: cannot remove \`$1': No such file or directory"
+elif [ -d $1 ] && [ $r_check -eq 0 ]; then
+  echo "File is a directory. Please use the -r tag."
+  #statements
+else 
+#file actually exists
+	#####################
+	#CHECK for "i" flag.#
+	#####################
+        if [ "$i_check" -eq 1 ] ;
+        then
+                read -p "rm: remove file \`$fileName'? " iCheckResponse
+                iResponse=$(echo $iCheckResponse | tr '[:upper:]' '[:lower:]' | cut -c1)
+                if [ $iResponse = $positiveResponse ] 2> /dev/null ; then
+                        #####################
+                  			#CHECK for "v" flag.#
+                  			#####################
+                  			if [ "$v_check" -eq 1 ] ; then
+                                          echo "removed \`$1'"
+                                          removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+                                          #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+                                          else
+                                          removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+                                          #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+                        fi
+			           #!!!!!-----END OF "v" CHECK-----!!!!!
+			           echo $fileRestoreInfo >> ~/.restore.info
+                fi
+        else
+            		#####################
+            		#CHECK for "v" flag.#
+            		#####################
+                if [ "$v_check" -eq 1 ] 2> /dev/null ; then
+                        #explain what was done
+                        echo "removed \`$1'"
+                        removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+                       # mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+                #Delete the file without any tags
+                else
+                        removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+                        #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+                fi
+      		#!!!!!-----END OF "v" CHECK-----!!!!!
+        fi
+	#!s!!!!-----END OF "i" CHECK-----!!!!!
+fi
+#!!!!!-----END OF FILE CHECK-----!!!!!
+}
+#!!!!!-----END OF MOVING-----!!!!!
+
+
+
+
+#####################
+#LOOP for next file.#
+#####################
+for nextFile in "$@"
+do
+        
+        moving_file $nextFile
+done
+
+
+
