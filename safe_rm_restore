@@ -1,20 +1,5 @@
 #!/bin/bash
 
-RMCFG_FILE=~/.rm.cfg
-
-
-
-
-safeDeleteDirectory=~/deleted
-restoreFile=~/.restore.info
-fileName=$1
-
-setDirectory $safeDeleteDirectory $RMCFG_FILE
-
-fileLocation=$safeDeleteDirectory"/"$fileName
-echo "$fileLocation"
-
-main
 
 function main() {
 	#check if file exists within the .restore.info file
@@ -91,4 +76,19 @@ function removeLine() {
 
 }
 
+MCFG_FILE=~/.rm.cfg
+
+
+
+
+safeDeleteDirectory=~/deleted
+restoreFile=~/.restore.info
+fileName=$1
+
+setDirectory $safeDeleteDirectory $RMCFG_FILE
+
+fileLocation=$safeDeleteDirectory"/"$fileName
+echo "$fileLocation"
+
+main
 
