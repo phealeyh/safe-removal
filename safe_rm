@@ -138,90 +138,90 @@ moving_file(){
 # --------------------- Main core functions please write them on your own ----
 
 
-#current directory
-currentDirectory=$(pwd)
+	#current directory
+	currentDirectory=$(pwd)
 
-# create file path using  filePath command
+	# create file path using  filePath command
 
- echo "DIY: create file path using a filePath parameter and command"
- mkdir $safeDeleteDirectory
-# create file name using  fileName=$(basename ???)
+	 echo "DIY: create file path using a filePath parameter and command"
+	 mkdir $safeDeleteDirectory
+	# create file name using  fileName=$(basename ???)
 
- echo "DIY: create file name using fileName= basename "
- fileName=$1
-# create file inode using ls -i
+	 echo "DIY: create file name using fileName= basename "
+	 fileName=$1
+	# create file inode using ls -i
 
- echo "DIY: create file inode using ls -i"
- nodeName=$(ls -i $fileName | cut -d' ' -f1)
+	 echo "DIY: create file inode using ls -i"
+	 nodeName=$(ls -i $fileName | cut -d' ' -f1)
 
-# change the format to  $filenName"_"$fileNode
+	# change the format to  $filenName"_"$fileNode
 
-  echo "DIY: change the format to fileName_fileNode "
-  newFileName=$fileName"_"$nodeName
+	  echo "DIY: change the format to fileName_fileNode "
+	  newFileName=$fileName"_"$nodeName
 
-# get the fileRestore Information
- 
-  echo "DIY: get the fileRestore information"
-  fileRestoreInfo=$newFileName":"$(pwd)"/"$fileName 
+	# get the fileRestore Information
+	 
+	  echo "DIY: get the fileRestore information"
+	  fileRestoreInfo=$newFileName":"$(pwd)"/"$fileName 
 
-# positiveReponse =y
-   
-   echo "DIY: set positiveReponse = y"
-   positiveResponse=y
+	# positiveReponse =y
+	   
+	   echo "DIY: set positiveReponse = y"
+	   positiveResponse=y
 
 
-#####################################
-#CHECK if file to-be deleted exists.#
-#####################################
-if [ ! -f $1 ] && [ ! -d $1 ] ;
-then
-        echo "rm: cannot remove \`$1': No such file or directory"
-elif [ -d $1 ] && [ $r_check -eq 0 ]; then
-  echo "File is a directory. Please use the -r tag."
-  #statements
-else 
-#file actually exists
-	#####################
-	#CHECK for "i" flag.#
-	#####################
-        if [ "$i_check" -eq 1 ] ;
-        then
-                read -p "rm: remove file \`$fileName'? " iCheckResponse
-                iResponse=$(echo $iCheckResponse | tr '[:upper:]' '[:lower:]' | cut -c1)
-                if [ $iResponse = $positiveResponse ] 2> /dev/null ; then
-                        #####################
-                  			#CHECK for "v" flag.#
-                  			#####################
-                  			if [ "$v_check" -eq 1 ] ; then
-                                          echo "removed \`$1'"
-                                          removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-                                          #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
-                                          else
-                                          removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-                                          #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
-                        fi
-			           #!!!!!-----END OF "v" CHECK-----!!!!!
-			           echo $fileRestoreInfo >> ~/.restore.info
-                fi
-        else
+	#####################################
+	#CHECK if file to-be deleted exists.#
+	#####################################
+	if [ ! -f $1 ] && [ ! -d $1 ] ;
+	then
+		echo "rm: cannot remove \`$1': No such file or directory"
+	elif [ -d $1 ] && [ $r_check -eq 0 ]; then
+	  echo "File is a directory. Please use the -r tag."
+	  #statements
+	else 
+	#file actually exists
+		#####################
+		#CHECK for "i" flag.#
+		#####################
+		if [ "$i_check" -eq 1 ] ;
+		then
+			read -p "rm: remove file \`$fileName'? " iCheckResponse
+			iResponse=$(echo $iCheckResponse | tr '[:upper:]' '[:lower:]' | cut -c1)
+			if [ $iResponse = $positiveResponse ] 2> /dev/null ; then
+						#####################
+						#CHECK for "v" flag.#
+						#####################
+						if [ "$v_check" -eq 1 ] ; then
+						  echo "removed \`$1'"
+						  removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+						  #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+						  else
+						  removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+						  #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+				fi
+					   #!!!!!-----END OF "v" CHECK-----!!!!!
+					   echo $fileRestoreInfo >> ~/.restore.info
+			fi
+		else
             		#####################
             		#CHECK for "v" flag.#
-            		#####################
-                if [ "$v_check" -eq 1 ] 2> /dev/null ; then
-                        #explain what was done
-                        echo "removed \`$1'"
-                        removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-                       # mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
-                #Delete the file without any tags
-                else
-                        removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-                        #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
-                fi
-      		#!!!!!-----END OF "v" CHECK-----!!!!!
-        fi
-	#!s!!!!-----END OF "i" CHECK-----!!!!!
-fi
-#!!!!!-----END OF FILE CHECK-----!!!!!
+			#####################
+			if [ "$v_check" -eq 1 ] 2> /dev/null ; then
+				#explain what was done
+				echo "removed \`$1'"
+				removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+			       # mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+			#Delete the file without any tags
+			else
+				removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+				#mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+			fi
+			#!!!!!-----END OF "v" CHECK-----!!!!!
+		fi
+		#!s!!!!-----END OF "i" CHECK-----!!!!!
+	fi
+	#!!!!!-----END OF FILE CHECK-----!!!!!
 }
 #!!!!!-----END OF MOVING-----!!!!!
 

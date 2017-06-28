@@ -76,7 +76,7 @@ function removeLine() {
 
 }
 
-MCFG_FILE=~/.rm.cfg
+RMCFG_FILE=~/.rm.cfg
 
 
 
