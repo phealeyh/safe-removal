@@ -40,7 +40,7 @@ function setDirectory() {
     echo "$RMCFG env variable"
     #environment variable found
 
-  elif [ -f "$2"] ; then
+  elif [ -f "$2" ] ; then
     #use the path from .rm.cfg since file exists
     safeDeleteDirectory="$contents"
     echo ".rm.cfg exists with the directory of $1"
@@ -76,11 +76,8 @@ function removeLine() {
 
 }
 
+#Global variables
 RMCFG_FILE=~/.rm.cfg
-
-
-
-
 safeDeleteDirectory=~/deleted
 restoreFile=~/.restore.info
 fileName=$1
@@ -91,4 +88,3 @@ fileLocation=$safeDeleteDirectory"/"$fileName
 echo "$fileLocation"
 
 main
-
