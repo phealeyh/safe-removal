@@ -4,6 +4,10 @@
 ########################################
 #CHECK if the user entered a file name.#
 ########################################
+########################################
+#------------missingFileName-----------#
+########################################
+
 
 missingFileName(){
 if
@@ -15,15 +19,18 @@ then
 fi
 }
 
+########################################
+#------------setDirectory--------------#
+########################################
 
-function setDirectory() {
+setDirectory() {
   contents=$(cat ~/.rm.cfg)
   if [  -n "$RMCFG" ] ; then
     safeDeleteDirectory="$RMCFG"
     echo "$safeDeleteDirectory env variable"
     #environment variable found
 
-  elif [ -f "$RMCFG_FILE"] ; then
+  elif [ -f "$RMCFG_FILE" ] ; then
     #use the path from .rm.cfg since file exists
     safeDeleteDirectory="$contents"
     echo ".rm.cfg exists with the directory of $safeDeleteDirectory"
@@ -39,7 +46,12 @@ function setDirectory() {
 }
 
 
-function createDirectory() {
+
+########################################
+#------------createDirectory-----------#
+########################################
+
+createDirectory() {
   #if directory doesn't exist
   if [ ! -d "$safeDeleteDirectory" ] ; then
     echo "Directory doesn't exist. Creating directory "
@@ -48,8 +60,12 @@ function createDirectory() {
   echo "The directory for the recyling bin will now be located in $safeDeleteDirectory"
 }
 
+########################################
+#------------removeFile----------------#
+########################################
 
-function removeFile() {
+
+removeFile() {
   fileRestoreInfo=""
   if [ "$1" -eq 1 ] && [ -d "$2" ]; then
     #recursive directory is being deleted
@@ -80,58 +96,15 @@ function removeFile() {
   fi
 }
 
-#set variables
-i_check=0
-v_check=0
-r_check=0
-safeDeleteDirectory=~/deleted
-RMCFG_FILE=~/.rm.cfg
-
-
-
-#check flags
-OPTIND=1
-while getopts virVIR opt
-do
-    opt=$(echo "$opt" | tr [:upper:] [:lower:])
-    case $opt in
-    i) echo "i_check has been selected"
-      i_check=1
-    ;;
-    v)
-     echo "v_check has been selected"
-      v_check=1
-    ;;
-    r)
-      echo "r_check has been selected"
-      r_check=1
-    ;;
-  esac
-done
-
-shift "$((OPTIND-1))"
-#end of checking flags
-
-
-
-
-
-
-
-
-missingFileName $#
-setDirectory
-
-
-
-
-#!!!!!-----END OF CHECK-----!!!!!
 
 
 #####################################################
 #MOVING the renamed file to the "deleted" directory.#
 #####################################################
 
+########################################
+#------------moving_file---------------#
+########################################
 
 moving_file(){
 
@@ -222,20 +195,72 @@ moving_file(){
 		#!s!!!!-----END OF "i" CHECK-----!!!!!
 	fi
 	#!!!!!-----END OF FILE CHECK-----!!!!!
-}
+
 #!!!!!-----END OF MOVING-----!!!!!
+}
+
+##################################
+#---------------check------------#
+##################################
+
+check(){
+
+	#check flags
+	OPTIND=1
+	while getopts virVIR opt
+	do
+	    opt=$(echo "$opt" | tr [:upper:] [:lower:])
+	    case $opt in
+	    i) echo "i_check has been selected"
+	      i_check=1
+	    ;;
+	    v)
+	     echo "v_check has been selected"
+	      v_check=1
+	    ;;
+	    r)
+	      echo "r_check has been selected"
+	      r_check=1
+	    ;;
+	  esac
+	done
+
+	shift "$((OPTIND-1))"
+	#end of checking flags
+
+	missingFileName $#
+	setDirectory
+
+	#!!!!!-----END OF CHECK-----!!!!!
 
 
+}
 
 
-#####################
-#LOOP for next file.#
-#####################
-for nextFile in "$@"
-do
-        
-        moving_file $nextFile
-done
+##################################
+#---------------main-------------#
+##################################
 
 
+main(){
+	#####################
+	#LOOP for next file.#
+	#####################
+	for nextFile in "$@"
+	do
+		
+		moving_file $nextFile
+	done
 
+}
+
+#set variables
+i_check=0
+v_check=0
+r_check=0
+safeDeleteDirectory=~/deleted
+RMCFG_FILE=~/.rm.cfg
+
+
+check $#
+main $@
