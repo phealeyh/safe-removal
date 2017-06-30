@@ -108,7 +108,6 @@ removeFile() {
 
 moving_file(){
 
-# --------------------- Main core functions please write them on your own ----
 
 
 	#current directory
