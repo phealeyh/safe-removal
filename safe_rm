@@ -11,7 +11,7 @@
 
 missingFileName(){
 if
-  #not missing any arguments
+	#missing arguments
         [ $1 -eq 0 ] 2> /dev/null
 then
         echo "rm: missing operand"
@@ -24,24 +24,26 @@ fi
 ########################################
 
 setDirectory() {
-  contents=$(cat ~/.rm.cfg)
-  if [  -n "$RMCFG" ] ; then
-    safeDeleteDirectory="$RMCFG"
-    echo "$safeDeleteDirectory env variable"
-    #environment variable found
+  if [ -f ~/.rm.cfg ] ; then
 
-  elif [ -f "$RMCFG_FILE" ] ; then
-    #use the path from .rm.cfg since file exists
-    safeDeleteDirectory="$contents"
-    echo ".rm.cfg exists with the directory of $safeDeleteDirectory"
+	  contents=$(cat ~/.rm.cfg)
+	  if [  -n "$RMCFG" ] ; then
+	    safeDeleteDirectory="$RMCFG"
+	    echo "$safeDeleteDirectory env variable"
+	    #environment variable found
 
-  else
-    echo ".rm.cfg doesn't exist"
-    #don't do anything and keep it to the default
+	  elif [ -f "$RMCFG_FILE" ] ; then
+	    #use the path from .rm.cfg since file exists
+	    safeDeleteDirectory="$contents"
+	    echo ".rm.cfg exists with the directory of $safeDeleteDirectory"
 
+	  else
+	    echo ".rm.cfg doesn't exist"
+	    #don't do anything and keep it to the default
+
+	  fi
   fi
 
-  createDirectory
 
 }
 
@@ -54,10 +56,10 @@ setDirectory() {
 createDirectory() {
   #if directory doesn't exist
   if [ ! -d "$safeDeleteDirectory" ] ; then
-    echo "Directory doesn't exist. Creating directory "
+    echo "Recycling bin doesn't exist. Creating the new directory for the recycling bin"
     mkdir "$safeDeleteDirectory"
   fi
-  echo "The directory for the recyling bin will now be located in $safeDeleteDirectory"
+  echo "Recycling bin directory: $safeDeleteDirectory"
 }
 
 ########################################
@@ -115,30 +117,30 @@ moving_file(){
 
 	# create file path using  filePath command
 
-	 echo "DIY: create file path using a filePath parameter and command"
-	 mkdir $safeDeleteDirectory
+	# echo "DIY: create file path using a filePath parameter and command"
+	# mkdir $safeDeleteDirectory
 	# create file name using  fileName=$(basename ???)
 
-	 echo "DIY: create file name using fileName= basename "
+	# echo "DIY: create file name using fileName= basename "
 	 fileName=$1
 	# create file inode using ls -i
 
-	 echo "DIY: create file inode using ls -i"
+	# echo "DIY: create file inode using ls -i"
 	 nodeName=$(ls -i $fileName | cut -d' ' -f1)
 
 	# change the format to  $filenName"_"$fileNode
 
-	  echo "DIY: change the format to fileName_fileNode "
+	#  echo "DIY: change the format to fileName_fileNode "
 	  newFileName=$fileName"_"$nodeName
 
 	# get the fileRestore Information
 	 
-	  echo "DIY: get the fileRestore information"
+	#  echo "DIY: get the fileRestore information"
 	  fileRestoreInfo=$newFileName":"$(pwd)"/"$fileName 
 
 	# positiveReponse =y
 	   
-	   echo "DIY: set positiveReponse = y"
+	#   echo "DIY: set positiveReponse = y"
 	   positiveResponse=y
 
 
@@ -147,7 +149,8 @@ moving_file(){
 	#####################################
 	if [ ! -f $1 ] && [ ! -d $1 ] ;
 	then
-		echo "rm: cannot remove \`$1': No such file or directory"
+	  echo "rm: cannot remove \`$1': No such file or directory"
+	#file and directory exists
 	elif [ -d $1 ] && [ $r_check -eq 0 ]; then
 	  echo "File is a directory. Please use the -r tag."
 	  #statements
@@ -227,8 +230,6 @@ check(){
 	shift "$((OPTIND-1))"
 	#end of checking flags
 
-	missingFileName $#
-	setDirectory
 
 	#!!!!!-----END OF CHECK-----!!!!!
 
@@ -247,7 +248,6 @@ main(){
 	#####################
 	for nextFile in "$@"
 	do
-		
 		moving_file $nextFile
 	done
 
@@ -261,5 +261,8 @@ safeDeleteDirectory=~/deleted
 RMCFG_FILE=~/.rm.cfg
 
 
+missingFileName $#
 check $#
+setDirectory
+createDirectory
 main $@
