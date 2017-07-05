@@ -227,10 +227,8 @@ check(){
 	  esac
 	done
 
-	shift "$((OPTIND-1))"
+	shift $((OPTIND-1))
 	#end of checking flags
-
-
 	#!!!!!-----END OF CHECK-----!!!!!
 
 
@@ -260,9 +258,8 @@ r_check=0
 safeDeleteDirectory=~/deleted
 RMCFG_FILE=~/.rm.cfg
 
-
 missingFileName $#
-check $#
+check $@ 
 setDirectory
 createDirectory
 main $@
