@@ -227,7 +227,6 @@ check(){
 	  esac
 	done
 
-	shift $((OPTIND-1))
 	#end of checking flags
 	#!!!!!-----END OF CHECK-----!!!!!
 
@@ -259,7 +258,13 @@ safeDeleteDirectory=~/deleted
 RMCFG_FILE=~/.rm.cfg
 
 missingFileName $#
-check $@ 
+check $@
+
+#This will shift the arguments from the arguments list so that the modifiers are ignored(if given) 
+if [ $i_check -eq 1 ] || [ $v_check -eq 1 ] || [ $r_check -eq 1 ]; then
+	shift $((OPTIND-1))
+fi
+
 setDirectory
 createDirectory
 main $@
