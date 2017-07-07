@@ -1,10 +1,10 @@
 #!/bin/bash
 
 
-function main() {
+main() {
 	#check if file exists within the .restore.info file
 	grepResults=$(cat $restoreFile | cut -d':' -f1 | grep -w "$fileName")
-	echo "$grepResults"
+	#echo "$grepResults"
 	if [ -n "$grepResults" ] ; then
 		#file exists within directory
 		echo "File has been found: " "$grepResults"	
@@ -23,7 +23,7 @@ function main() {
 				echo "Will not overwrite existing file"
 			fi
 		else
-			echo "File doesn't exist. restoring file now"
+			echo "File doesn't exist. Restoring file now"
 			restoreFile
 			removeLine
 		fi
@@ -33,8 +33,10 @@ function main() {
 
 }
 
-function setDirectory() {
-  contents=$(cat ~/.rm.cfg)
+setDirectory() {
+  if [ -f ~/.rm.cfg ] ; then
+  	contents=$(cat ~/.rm.cfg)
+  fi
   if [ -n "$RMCFG" ] ; then
     safeDeleteDirectory="$RMCFG"
     echo "$RMCFG env variable"
@@ -45,31 +47,26 @@ function setDirectory() {
     safeDeleteDirectory="$contents"
     echo ".rm.cfg exists with the directory of $1"
 
-
-  else
-    echo ".rm.cfg doesn't exist"
-    #don't do anything and keep it to the default
-
   fi
 
 }
 
 
-function deleteFile() {
+deleteFile() {
 	#remove the file from the directory
 	thisDirectory=$(pwd)
 	thisDirectory=$thisDirectory"/"
 	rm -r "$thisDirectory$fileName"
 }
 
-function restoreFile() {
+restoreFile() {
 	thisDirectory=$(pwd)
 	thisDirectory=$thisDirectory"/"
 	mv "$fileLocation" "$thisDirectory"
 }
 
 #This function will remove the line from the .restore.info file
-function removeLine() {
+removeLine() {
 	restoreFile2=~/.restore.info2
 	grep -v "$fileName" "$restoreFile" > "$restoreFile2"
 	mv "$restoreFile2" "$restoreFile"
