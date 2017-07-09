@@ -14,8 +14,7 @@ if
 	#missing arguments
         [ $1 -eq 0 ] 2> /dev/null
 then
-        echo "rm: missing operand"
-        echo "Try \`rm--help for more information'"
+        echo "rm: missing operand - no file given"
 fi
 }
 
