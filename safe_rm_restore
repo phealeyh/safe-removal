@@ -23,7 +23,7 @@ main() {
 				echo "Will not overwrite existing file"
 			fi
 		else
-			echo "File doesn't exist. Restoring file now"
+			echo "File doesn't exist in the current directory. Restoring file now"
 			restoreFile
 			removeLine
 		fi
