@@ -1,0 +1,92 @@
+#!/bin/bash 
+
+
+main() 
+{
+	#check if file exists within the .restore.info file
+	grepResults=$(cat $restoreFile | cut -d':' -f1 | grep -w "$fileName")
+	#echo "$grepResults"
+	if [ -n "$grepResults" ] ; then
+		#file exists within directory
+		echo "File has been found: " "$grepResults"	
+		#check if file already exists
+		currentDirectory=$(ls -a | grep -w "$fileName")
+		if [ -n "$currentDirectory" ] ; then
+			echo "File already exists"
+			echo "Do you want to overwrite the file?"
+			read answer
+			if [ $answer = "y" -o $answer = "YES"  -o $answer = "Y" -o $answer = "yes" ] ; then
+
+				deleteFile
+				restoreFile
+				removeLine
+			else
+				echo "Will not overwrite existing file"
+			fi
+		else
+			echo "File doesn't exist in the current directory. Restoring file now"
+			restoreFile
+			removeLine
+		fi
+	else
+		echo "File has not been found."
+	fi
+
+}
+
+setDirectory() 
+{
+  if [ -f ~/.rm.cfg ] ; then
+  	contents=$(cat ~/.rm.cfg)
+  fi
+  if [ -n "$RMCFG" ] ; then
+    safeDeleteDirectory="$RMCFG"
+    echo "$RMCFG env variable"
+    #environment variable found
+
+  elif [ -f "$2" ] ; then
+    #use the path from .rm.cfg since file exists
+    safeDeleteDirectory="$contents"
+    echo ".rm.cfg exists with the directory of $1"
+
+  fi
+
+}
+
+
+deleteFile() 
+{
+	#remove the file from the directory
+	thisDirectory=$(pwd)
+	thisDirectory=$thisDirectory"/"
+	rm -r "$thisDirectory$fileName"
+}
+
+restoreFile() 
+{
+	thisDirectory=$(pwd)
+	thisDirectory=$thisDirectory"/"
+	mv "$fileLocation" "$thisDirectory"
+}
+
+#This function will remove the line from the .restore.info file
+removeLine()
+{
+	restoreFile2=~/.restore.info2
+	grep -v "$fileName" "$restoreFile" > "$restoreFile2"
+	mv "$restoreFile2" "$restoreFile"
+
+}
+
+#Global variables
+RMCFG_FILE=~/.rm.cfg
+safeDeleteDirectory=~/deleted
+restoreFile=~/.restore.info
+fileName=$1
+
+setDirectory $safeDeleteDirectory $RMCFG_FILE
+
+fileLocation=$safeDeleteDirectory"/"$fileName
+echo "$fileLocation"
+
+main
