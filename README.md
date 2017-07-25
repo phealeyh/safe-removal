@@ -9,10 +9,14 @@ Removing a file
 
 
 Restoring a file
-Check the /deleted directory to find the inode of the file and use that when restoring your file
+Check the ~/deleted directory to find the inode of the file and use that when restoring your file
 ./safe_rm_restore.rm <file_name_with_inode>
 
 Tags/modifiers
 -I = Interactive, provides a interactive way of deleting the files with prompts
 -V = Verbose, displays the action taken
 -R = Recursive, removes files rercusively if there is a folder
+
+Adding the script to your /usr/local/bin for global execution of the script:
+
+ln -sf /path/to/directory/for/script /usr/local/bin/name-of-soft-link
