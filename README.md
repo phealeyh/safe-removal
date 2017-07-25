@@ -7,6 +7,7 @@ It will also restore files to the original location with the safe_rm_restore scr
 Removing a file
 ./safe_rm.rm <file_name>
 
+
 Restoring a file
 Check the /deleted directory to find the inode of the file and use that when restoring your file
 ./safe_rm_restore.rm <file_name_with_inode>
