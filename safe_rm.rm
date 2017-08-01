@@ -10,12 +10,12 @@
 
 missingFileName()
 {
-if
-	#missing arguments
-        [ $1 -eq 0 ] 2> /dev/null
-then
-        echo "rm: missing operand - no file given"
-fi
+	if
+		#missing arguments
+		[ $1 -eq 0 ] 2> /dev/null
+	then
+		echo "rm: missing operand - no file given"
+	fi
 }
 
 ########################################
@@ -24,30 +24,26 @@ fi
 
 setDirectory() 
 {
-  if [ -f ~/.rm.cfg ] ; then
+	if [ -f ~/.rm.cfg ] ; then
+		contents=$(cat ~/.rm.cfg)
+		if [  -n "$RMCFG" ] ; then
+			safeDeleteDirectory="$RMCFG"
+			echo "$safeDeleteDirectory env variable"
+			#environment variable found
 
-	  contents=$(cat ~/.rm.cfg)
-	  if [  -n "$RMCFG" ] ; then
-	    safeDeleteDirectory="$RMCFG"
-	    echo "$safeDeleteDirectory env variable"
-	    #environment variable found
+		elif [ -f "$RMCFG_FILE" ] ; then
+			#use the path from .rm.cfg since file exists
+			safeDeleteDirectory="$contents"
+			echo ".rm.cfg exists with the directory of $safeDeleteDirectory"
 
-	  elif [ -f "$RMCFG_FILE" ] ; then
-	    #use the path from .rm.cfg since file exists
-	    safeDeleteDirectory="$contents"
-	    echo ".rm.cfg exists with the directory of $safeDeleteDirectory"
-
-	  else
-	    echo ".rm.cfg doesn't exist"
-	    #don't do anything and keep it to the default
-
-	  fi
-  fi
+		fi
+	else
+		echo ".rm.cfg doesn't exist"
+		#don't do anything and keep it to the default
+	fi
 
 
 }
-
-
 
 ########################################
 #------------createDirectory-----------#
@@ -55,49 +51,50 @@ setDirectory()
 
 createDirectory()
 {
-  #if directory doesn't exist
-  if [ ! -d "$safeDeleteDirectory" ] ; then
-    echo "Recycling bin doesn't exist. Creating the new directory for the recycling bin"
-    mkdir "$safeDeleteDirectory"
-  fi
-  echo "Recycling bin directory: $safeDeleteDirectory"
+	#if directory doesn't exist
+	if [ ! -d "$safeDeleteDirectory" ] ; then
+		echo "Recycling bin doesn't exist. Creating the new directory for the recycling bin"
+		mkdir "$safeDeleteDirectory"
+	fi
+		echo "Recycling bin directory: $safeDeleteDirectory"
 }
 
 ########################################
 #------------removeFile----------------#
 ########################################
-
-
 removeFile()
 { 
-  fileRestoreInfo=""
-  if [ "$1" -eq 1 ] && [ -d "$2" ]; then
-    #recursive directory is being deleted
-    IFS=$'\n';
-    count=$(find "$arg" -not -path '*/\.*' | tac | wc -l)
-    for file in $(find "$fileName" -not -path '*/\.*' | tac);
-    do
-      fileLocation="$3/$file"
-      currentFile=""
 
-      if [ $count -ne 1 ] ; then
-        currentFile=$(echo $file | rev | cut -d'/' -f1 | rev)
-      else
-        currentFile=$(echo $file | cut -d'/' -f1)
-      fi
+	fileRestoreInfo=""
+	if [ "$1" -eq 1 ] && [ -d "$2" ]; then
+		#recursive directory is being deleted
+		IFS=$'\n';
+		count=$(find "$fileName" -not -path '*/\.*' | tac | wc -l)
 
-      node=$(ls -id $fileLocation | grep -w "$file" | cut -d' ' -f1 )
-      actualName=$(echo $currentFile"_"$node)
+		for file in $(find "$fileName" -not -path '*/\.*' | tac);
+		do
+			fileLocation="$3/$file"
+			currentFile=""
 
-      mv $fileLocation $4"/"$actualName 2>/dev/null 
-      fileRestoreInfo=$actualName":"$(pwd)"/"$currentFile 
-      count=$(($count+1))
-      echo $fileRestoreInfo >> ~/.restore.info
-    done
-  else #non recursive directory is being deleted
-      mv $2 $4"/"$5 2>/dev/null
-      echo $6 >> ~/.restore.info
-  fi
+			if [ $count -ne 1 ] ; then
+				currentFile=$(echo $file | rev | cut -d'/' -f1 | rev)
+			else
+				currentFile=$(echo $file | cut -d'/' -f1)
+			fi
+
+			node=$(ls -id $fileLocation | grep -w "$file" | cut -d' ' -f1 )
+			actualName=$(echo $currentFile"_"$node)
+			mv $fileLocation $4"/"$actualName 2>/dev/null 
+			fileRestoreInfo=$actualName":"$(pwd)"/"$currentFile 
+			count=$(($count+1))
+			echo $fileRestoreInfo >> ~/.restore.info
+
+		done
+
+	else #non recursive directory is being deleted
+		mv $2 $4"/"$5 2>/dev/null
+		echo $6 >> ~/.restore.info
+	fi
 }
 
 
@@ -113,52 +110,34 @@ removeFile()
 moving_file()
 {
 
-
-
 	#current directory
 	currentDirectory=$(pwd)
 
-	# create file path using  filePath command
+	# Filename supplied by the argument
+	fileName=$1
 
-	# echo "DIY: create file path using a filePath parameter and command"
-	# mkdir $safeDeleteDirectory
-	# create file name using  fileName=$(basename ???)
-
-	# echo "DIY: create file name using fileName= basename "
-	 fileName=$1
 	# create file inode using ls -i
+	nodeName=$(ls -i $fileName | cut -d' ' -f1)
 
-	# echo "DIY: create file inode using ls -i"
-	 nodeName=$(ls -i $fileName | cut -d' ' -f1)
-
-	# change the format to  $filenName"_"$fileNode
-
-	#  echo "DIY: change the format to fileName_fileNode "
-	  newFileName=$fileName"_"$nodeName
+	# Includes the filename and the nodename
+	newFileName=$fileName"_"$nodeName
 
 	# get the fileRestore Information
-	 
-	#  echo "DIY: get the fileRestore information"
-	  fileRestoreInfo=$newFileName":"$(pwd)"/"$fileName 
+	fileRestoreInfo=$newFileName":"$(pwd)"/"$fileName 
 
-	# positiveReponse =y
-	   
-	#   echo "DIY: set positiveReponse = y"
-	   positiveResponse=y
-
+	positiveResponse=y
 
 	#####################################
 	#CHECK if file to-be deleted exists.#
 	#####################################
 	if [ ! -f $1 ] && [ ! -d $1 ] ;
 	then
-	  echo "rm: cannot remove \`$1': No such file or directory"
+		echo "rm: cannot remove \`$1': No such file or directory"
 	#file and directory exists
 	elif [ -d $1 ] && [ $r_check -eq 0 ]; then
-	  echo "File is a directory. Please use the -r tag."
-	  #statements
-	else 
+		echo "File is a directory. Please use the -r tag."
 	#file actually exists
+	else 
 		#####################
 		#CHECK for "i" flag.#
 		#####################
@@ -167,37 +146,34 @@ moving_file()
 			read -p "rm: remove file \`$fileName'? " iCheckResponse
 			iResponse=$(echo $iCheckResponse | tr '[:upper:]' '[:lower:]' | cut -c1)
 			if [ $iResponse = $positiveResponse ] 2> /dev/null ; then
-						#####################
-						#CHECK for "v" flag.#
-						#####################
-						if [ "$v_check" -eq 1 ] ; then
-						  echo "removed \`$1'"
-						  removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-						  #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
-						  else
-						  removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-						  #mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
+				#####################
+				#CHECK for "v" flag.#
+				#####################
+				if [ "$v_check" -eq 1 ] ; then
+					echo "removed \`$1'"
+					removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+				else
+					removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
 				fi
-					   #!!!!!-----END OF "v" CHECK-----!!!!!
-					   echo $fileRestoreInfo >> ~/.restore.info
+				#!!!!!-----END OF "v" CHECK-----!!!!!
+				echo $fileRestoreInfo >> ~/.restore.info
 			fi
+		#!!!!!-----END OF "i" CHECK-----!!!!!
+
+		#####################
+		#CHECK for "v" flag.#
+		#####################
+		elif [ "$v_check" -eq 1 ] 2> /dev/null ; then
+			echo "removed \`$1'"
+			removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+		
+		#####################
+		# NO FLAG SELECTED  #
+		#####################
 		else
-            		#####################
-            		#CHECK for "v" flag.#
-			#####################
-			if [ "$v_check" -eq 1 ] 2> /dev/null ; then
-				#explain what was done
-				echo "removed \`$1'"
-				removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-			       # mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
-			#Delete the file without any tags
-			else
-				removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
-				#mv $1 $safeDeleteDirectory"/"$newFileName 2>/dev/null
-			fi
-			#!!!!!-----END OF "v" CHECK-----!!!!!
+			removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
 		fi
-		#!s!!!!-----END OF "i" CHECK-----!!!!!
+		#!!!!!-----END OF "v" CHECK-----!!!!!
 	fi
 	#!!!!!-----END OF FILE CHECK-----!!!!!
 
@@ -215,25 +191,24 @@ check()
 	OPTIND=1
 	while getopts virVIR opt
 	do
-	    opt=$(echo "$opt" | tr [:upper:] [:lower:])
-	    case $opt in
-	    i) echo "i_check has been selected"
-	      i_check=1
-	    ;;
-	    v)
-	     echo "v_check has been selected"
-	      v_check=1
-	    ;;
-	    r)
-	      echo "r_check has been selected"
-	      r_check=1
-	    ;;
-	  esac
+		opt=$(echo "$opt" | tr [:upper:] [:lower:])
+		case $opt in
+		i)
+			echo "i_check has been selected"
+			i_check=1
+		;;
+		v)
+			echo "v_check has been selected"
+			v_check=1
+		;;
+		r)
+			echo "r_check has been selected"
+			r_check=1
+		;;
+		esac
 	done
-
 	#end of checking flags
 	#!!!!!-----END OF CHECK-----!!!!!
-
 
 }
 
