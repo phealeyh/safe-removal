@@ -1,4 +1,8 @@
 #!/bin/bash 
+	
+##########################
+#	main		 #
+##########################
 
 
 main() 
@@ -34,6 +38,11 @@ main()
 
 }
 
+
+##########################
+#	setDirectory	 #
+##########################
+
 setDirectory() 
 {
   if [ -f ~/.rm.cfg ] ; then
@@ -54,6 +63,10 @@ setDirectory()
 }
 
 
+##########################
+#	deleteFile	 #
+##########################
+
 deleteFile() 
 {
 	#remove the file from the directory
@@ -62,12 +75,21 @@ deleteFile()
 	rm -r "$thisDirectory$fileName"
 }
 
+##########################
+#	restoreFile	 #
+##########################
+
 restoreFile() 
 {
 	thisDirectory=$(pwd)
 	thisDirectory=$thisDirectory"/"
 	mv "$fileLocation" "$thisDirectory"
 }
+
+
+##########################
+#	removeLine	 #
+##########################
 
 #This function will remove the line from the .restore.info file
 removeLine()
