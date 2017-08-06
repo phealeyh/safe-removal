@@ -65,15 +65,16 @@ createDirectory()
 removeFile()
 { 
 
-	fileRestoreInfo=""
-	if [ "$1" -eq 1 ] && [ -d "$2" ]; then
+#$1=r_check, $2=fileName, $3=currentDirectory, $4=safeDeleteDirectory, $5=newFileName, $6=fileRestoreInfo
+
+	if [ "$r_check" -eq 1 ] && [ -d "$fileName" ]; then
 		#recursive directory is being deleted
 		IFS=$'\n';
 		count=$(find "$fileName" -not -path '*/\.*' | tac | wc -l)
 
 		for file in $(find "$fileName" -not -path '*/\.*' | tac);
 		do
-			fileLocation="$3/$file"
+			fileLocation="$currentDirectory/$file"
 			currentFile=""
 
 			if [ $count -ne 1 ] ; then
@@ -84,7 +85,7 @@ removeFile()
 
 			node=$(ls -id $fileLocation | grep -w "$file" | cut -d' ' -f1 )
 			actualName=$(echo $currentFile"_"$node)
-			mv $fileLocation $4"/"$actualName 2>/dev/null 
+			mv $fileLocation $safeDeleteDirectory"/"$actualName 2>/dev/null 
 			fileRestoreInfo=$actualName":"$(pwd)"/"$currentFile 
 			count=$(($count+1))
 			echo $fileRestoreInfo >> ~/.restore.info
@@ -92,8 +93,8 @@ removeFile()
 		done
 
 	else #non recursive directory is being deleted
-		mv $2 $4"/"$5 2>/dev/null
-		echo $6 >> ~/.restore.info
+		mv $fileName $safeDeleteDirectory"/"$newFileName 2>/dev/null
+		echo $fileRestoreInfo >> ~/.restore.info
 	fi
 }
 
@@ -151,9 +152,9 @@ moving_file()
 				#####################
 				if [ "$v_check" -eq 1 ] ; then
 					echo "removed \`$1'"
-					removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+					removeFile
 				else
-					removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+					removeFile
 				fi
 				#!!!!!-----END OF "v" CHECK-----!!!!!
 				echo $fileRestoreInfo >> ~/.restore.info
@@ -165,13 +166,13 @@ moving_file()
 		#####################
 		elif [ "$v_check" -eq 1 ] 2> /dev/null ; then
 			echo "removed \`$1'"
-			removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+			removeFile
 		
 		#####################
 		# NO FLAG SELECTED  #
 		#####################
 		else
-			removeFile $r_check $fileName $currentDirectory $safeDeleteDirectory $newFileName $fileRestoreInfo
+			removeFile
 		fi
 		#!!!!!-----END OF "v" CHECK-----!!!!!
 	fi
