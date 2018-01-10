@@ -1,0 +1,18 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+check	safe_rm.rm	/^check()$/;"	f
+createDirectory	safe_rm.rm	/^createDirectory()$/;"	f
+deleteFile	safe_rm_restore.rm	/^deleteFile() $/;"	f
+main	safe_rm.rm	/^main()$/;"	f
+main	safe_rm_restore.rm	/^main() $/;"	f
+missingFileName	safe_rm.rm	/^missingFileName()$/;"	f
+moving_file	safe_rm.rm	/^moving_file()$/;"	f
+removeFile	safe_rm.rm	/^removeFile()$/;"	f
+removeLine	safe_rm_restore.rm	/^removeLine()$/;"	f
+restoreFile	safe_rm_restore.rm	/^restoreFile() $/;"	f
+setDirectory	safe_rm.rm	/^setDirectory() $/;"	f
+setDirectory	safe_rm_restore.rm	/^setDirectory() $/;"	f

@@ -1,9 +1,8 @@
 #!/bin/bash 
 	
 ##########################
-#	main		 #
+#	main              		 #
 ##########################
-
 
 main() 
 {
@@ -37,7 +36,7 @@ main()
 
 }
 ##########################
-#	setDirectory	 #
+#	setDirectory	         #
 ##########################
 setDirectory() 
 {
@@ -58,7 +57,7 @@ setDirectory()
 
 
 ##########################
-#	deleteFile	 #
+#	deleteFile	           #
 ##########################
 
 deleteFile() 
@@ -70,7 +69,7 @@ deleteFile()
 }
 
 ##########################
-#	restoreFile	 #
+#	restoreFile	           #
 ##########################
 
 restoreFile() 
@@ -82,7 +81,7 @@ restoreFile()
 
 
 ##########################
-#	removeLine	 #
+#	removeLine	           #
 ##########################
 
 #This function will remove the line from the .restore.info file
